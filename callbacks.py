@@ -1,14 +1,15 @@
 # callbacks.py
 import dash
-from dash import Input, Output, State
+from dash import Input, Output, State, ctx, html
 import base64
 import io
 from PIL import Image
 import numpy as np
 import cv2
+import uuid
 
 def register_callbacks(app: dash.Dash):
-    
+
     @app.callback(
         Output("upload-status", "children"),
         Output("original-image-store", "data"),
@@ -18,29 +19,45 @@ def register_callbacks(app: dash.Dash):
     def store_image(contents):
         if contents is None:
             return "No image uploaded", None
-        
-        # Strip the base64 header
+
         content_type, content_string = contents.split(',')
-        
-        # Decode the image
-        img_data = base64.b64decode(content_string)
-        img = Image.open(io.BytesIO(img_data))
-        
-        # Convert to a format OpenCV can work with (NumPy array)
-        img = np.array(img)
-        
-        # Optionally, convert to grayscale (or handle as needed)
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        
-        # Store image in dcc.Store
         return "Image successfully uploaded!", content_string
 
     @app.callback(
-        Output("image-preview", "src"),
-        Input("original-image-store", "data"),
-        prevent_initial_call=True
+        Output("operation-list", "children"),
+        Input("operation-stack", "data"),
+        Input("selected-operation", "data"),
     )
-    def update_image_display(image_base64):
-        if image_base64 is None:
-            return None
-        return f"data:image/png;base64,{image_base64}"
+    def update_operation_list(stack, selected_id):
+        if not stack:
+            return html.Div("No operations added yet.")
+
+        def render_item(op):
+            style = {"padding": "5px", "marginBottom": "5px", "border": "1px solid #ddd", "borderRadius": "5px"}
+            if op["id"] == selected_id:
+                style["backgroundColor"] = "#e0f7fa"
+            return html.Div(op["type"].capitalize(), style=style, id={"type": "op-item", "index": op["id"]})
+
+        return [render_item(op) for op in stack]
+
+    @app.callback(
+        Output("operation-stack", "data", allow_duplicate=True),
+        Input("add-blur-btn", "n_clicks"),
+        Input("add-canny-btn", "n_clicks"),
+        State("operation-stack", "data"),
+        prevent_initial_call="initial_duplicate"
+    )
+    def add_operation(n_blur, n_canny, stack):
+        button_id = ctx.triggered_id
+        if stack is None:
+            stack = []
+
+        new_op = None
+        if button_id == "add-blur-btn":
+            new_op = {"id": str(uuid.uuid4()), "type": "blur", "params": {"ksize": 5}}
+        elif button_id == "add-canny-btn":
+            new_op = {"id": str(uuid.uuid4()), "type": "canny", "params": {"threshold1": 100, "threshold2": 200}}
+
+        if new_op:
+            stack.append(new_op)
+        return stack

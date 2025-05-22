@@ -4,8 +4,7 @@ from dash import dcc, html
 def render():
     return html.Div([
         html.H4("Component Cascader"),
-        
-        # Image upload section
+
         html.Div([
             html.H5("Upload Image"),
             dcc.Upload(
@@ -27,12 +26,13 @@ def render():
             html.Div(id="upload-status", style={"color": "green", "marginTop": "10px"})
         ], style={"marginBottom": "20px"}),
 
-        # Placeholder for operation list (we'll add operations here later)
         html.Div([
             html.H5("Operations List"),
-            html.Div([
-                html.Button("Add Gaussian Blur", id="add-blur-btn"),
-                html.Button("Add Canny Edge", id="add-canny-btn")
-            ])
+            html.Div(id="operation-list")
+        ]),
+
+        html.Div([
+            html.Button("Add Gaussian Blur", id="add-blur-btn", style={"marginTop": "10px", "marginRight": "5px"}),
+            html.Button("Add Canny Edge", id="add-canny-btn", style={"marginTop": "10px"})
         ])
     ])

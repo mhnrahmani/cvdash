@@ -1,17 +1,18 @@
 # layout.py
 from dash import html
-from components import cascader, preview, modifier
+import dash_bootstrap_components as dbc
+from components import cascader, modifier, preview, toolbar
 
 def get_layout():
-    return html.Div([
-        html.Div([
-            html.Div(cascader.render(), className="pane-left"),
-
-            html.Div([
-                html.Div(modifier.render(), className="pane-modifier"),
-                html.Div(preview.render(), className="pane-preview"),
-            ], className="pane-right"),
-        ], className="main-pane-container"),
-
-        html.Div("Toolbar / Footer Placeholder", className="pane-bottom")
-    ])
+    return dbc.Container([
+        dbc.Row([
+            dbc.Col(cascader.render(), width=3, style={"borderRight": "1px solid #ccc", "padding": "10px"}),
+            dbc.Col([
+                html.Div(modifier.render(), style={"height": "40%", "borderBottom": "1px solid #ccc", "padding": "10px"}),
+                html.Div(preview.render(), style={"height": "60%", "padding": "10px"})
+            ], width=9)
+        ], style={"height": "100vh"}),
+        # dbc.Row([
+        #     dbc.Col(toolbar.render(), width=12)
+        # ])
+    ], fluid=True)

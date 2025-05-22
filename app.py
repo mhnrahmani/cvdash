@@ -1,16 +1,18 @@
 # app.py
 import dash
 import dash_bootstrap_components as dbc
-from dash import dcc, html
+from dash import html, dcc
 from layout import get_layout
 from callbacks import register_callbacks
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], assets_folder="assets")
 app.title = "Image Processing Dashboard"
 
-# Store the image at the app level
+# Global stores for image and operation management
 app.layout = html.Div([
-    dcc.Store(id="original-image-store"),  # Store the image globally here
+    dcc.Store(id="original-image-store"),
+    dcc.Store(id="operation-stack", data=[]),
+    dcc.Store(id="selected-operation", data=None),
     get_layout()
 ])
 
