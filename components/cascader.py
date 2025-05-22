@@ -1,4 +1,5 @@
 # components/cascader.py
+
 from dash import dcc, html
 
 def render():
@@ -28,7 +29,8 @@ def render():
 
         html.Div([
             html.H5("Operations List"),
-            html.Div(id="operation-list")
+            html.Div(id="operation-list"),
+            html.Button("Delete Selected", id="delete-operation-btn", style={"marginTop": "10px", "backgroundColor": "#ff4d4f", "color": "white"})
         ]),
 
         html.Div([

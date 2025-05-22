@@ -1,6 +1,7 @@
 # callbacks.py
 import dash
 from dash import Input, Output, State, ctx, html
+from dash import MATCH, ALL
 import base64
 import io
 from PIL import Image
@@ -61,3 +62,30 @@ def register_callbacks(app: dash.Dash):
         if new_op:
             stack.append(new_op)
         return stack
+
+    @app.callback(
+        Output("selected-operation", "data"),
+        Input({"type": "op-item", "index": ALL}, "n_clicks"),
+        State("operation-stack", "data"),
+        prevent_initial_call=True
+    )
+    def select_operation(n_clicks_list, stack):
+        triggered = ctx.triggered_id
+        if not triggered or not stack:
+            return dash.no_update
+        return triggered["index"]
+
+    @app.callback(
+        Output("operation-stack", "data"),
+        Output("selected-operation", "data", allow_duplicate=True),
+        Input("delete-operation-btn", "n_clicks"),
+        State("operation-stack", "data"),
+        State("selected-operation", "data"),
+        prevent_initial_call=True
+    )
+    def delete_selected(n_clicks, stack, selected_id):
+        if not stack or not selected_id:
+            return dash.no_update, dash.no_update
+
+        new_stack = [op for op in stack if op["id"] != selected_id]
+        return new_stack, None
