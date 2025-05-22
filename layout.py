@@ -11,8 +11,6 @@ def get_layout():
                 html.Div(modifier.render(), style={"height": "40%", "borderBottom": "1px solid #ccc", "padding": "10px"}),
                 html.Div(preview.render(), style={"height": "60%", "padding": "10px"})
             ], width=9)
-        ], style={"height": "100vh"}),
-        # dbc.Row([
-        #     dbc.Col(toolbar.render(), width=12)
-        # ])
+        ], style={"height": "90vh"}),
+        html.Pre(id="debug-output")
     ], fluid=True)

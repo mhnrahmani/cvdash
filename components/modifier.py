@@ -1,8 +1,6 @@
 # components/modifier.py
+
 from dash import html
 
 def render():
-    return html.Div([
-        html.H4("Component Modifier"),
-        html.P("Dynamic controls for selected operation")
-    ])
+    return html.Div(id="modifier-pane", style={"padding": "10px"})
