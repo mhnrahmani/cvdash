@@ -43,10 +43,11 @@ def register_callbacks(app: dash.Dash):
 
     @app.callback(
         Output("operation-stack", "data", allow_duplicate=True),
+        Output("selected-operation", "data", allow_duplicate=True),
         Input("add-blur-btn", "n_clicks"),
         Input("add-canny-btn", "n_clicks"),
         State("operation-stack", "data"),
-        prevent_initial_call="initial_duplicate"
+        prevent_initial_call=True
     )
     def add_operation(n_blur, n_canny, stack):
         button_id = ctx.triggered_id
@@ -61,7 +62,9 @@ def register_callbacks(app: dash.Dash):
 
         if new_op:
             stack.append(new_op)
-        return stack
+            return stack, new_op["id"]
+
+        return stack, dash.no_update
 
     @app.callback(
         Output("selected-operation", "data"),
@@ -88,4 +91,7 @@ def register_callbacks(app: dash.Dash):
             return dash.no_update, dash.no_update
 
         new_stack = [op for op in stack if op["id"] != selected_id]
-        return new_stack, None
+        new_selected = new_stack[-1]["id"] if new_stack else None
+
+        return new_stack, new_selected
+
