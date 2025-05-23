@@ -1,20 +1,19 @@
 # callbacks.py
+
 import dash
 from dash import Input, Output, State, ctx, html
-from dash import MATCH, ALL
+from dash import ALL
 from dash.exceptions import PreventUpdate
-import base64
-import io
-from PIL import Image
-import numpy as np
-import cv2
 import uuid
 from operations import operation_renderers
 from operations.blur import PARAMS as BLUR_PARAMS
 from operations.canny import PARAMS as CANNY_PARAMS
 
-def register_callbacks(app: dash.Dash):
 
+def register_callbacks(app: dash.Dash):
+    # -----------------------------
+    # Image Upload
+    # -----------------------------
     @app.callback(
         Output("upload-status", "children"),
         Output("original-image-store", "data"),
@@ -25,9 +24,12 @@ def register_callbacks(app: dash.Dash):
         if contents is None:
             return "No image uploaded", None
 
-        content_type, content_string = contents.split(',')
+        _, content_string = contents.split(',')
         return "Image successfully uploaded!", content_string
 
+    # -----------------------------
+    # Operation List UI Update
+    # -----------------------------
     @app.callback(
         Output("operation-list", "children"),
         Input("operation-stack", "data"),
@@ -38,13 +40,20 @@ def register_callbacks(app: dash.Dash):
             return html.Div("No operations added yet.")
 
         def render_item(op):
-            style = {"padding": "5px", "marginBottom": "5px", "border": "1px solid #ddd", "borderRadius": "5px"}
+            style = {
+                "padding": "5px", "marginBottom": "5px",
+                "border": "1px solid #ddd", "borderRadius": "5px"
+            }
             if op["id"] == selected_id:
                 style["backgroundColor"] = "#e0f7fa"
-            return html.Div(op["type"].capitalize(), style=style, id={"type": "op-item", "index": op["id"]})
+            return html.Div(op["type"].capitalize(), style=style,
+                            id={"type": "op-item", "index": op["id"]})
 
         return [render_item(op) for op in stack]
 
+    # -----------------------------
+    # Add Operation
+    # -----------------------------
     @app.callback(
         Output("operation-stack", "data", allow_duplicate=True),
         Output("selected-operation", "data", allow_duplicate=True),
@@ -68,8 +77,11 @@ def register_callbacks(app: dash.Dash):
             stack.append(new_op)
             return stack, new_op["id"]
 
-        return stack, dash.no_update
+        return dash.no_update, dash.no_update
 
+    # -----------------------------
+    # Select Operation
+    # -----------------------------
     @app.callback(
         Output("selected-operation", "data"),
         Input({"type": "op-item", "index": ALL}, "n_clicks"),
@@ -79,9 +91,12 @@ def register_callbacks(app: dash.Dash):
     def select_operation(n_clicks_list, stack):
         triggered = ctx.triggered_id
         if not triggered or not stack:
-            return dash.no_update
+            raise PreventUpdate
         return triggered["index"]
 
+    # -----------------------------
+    # Delete Selected Operation
+    # -----------------------------
     @app.callback(
         Output("operation-stack", "data"),
         Output("selected-operation", "data", allow_duplicate=True),
@@ -92,13 +107,15 @@ def register_callbacks(app: dash.Dash):
     )
     def delete_selected(n_clicks, stack, selected_id):
         if not stack or not selected_id:
-            return dash.no_update, dash.no_update
+            raise PreventUpdate
 
         new_stack = [op for op in stack if op["id"] != selected_id]
         new_selected = new_stack[-1]["id"] if new_stack else None
-
         return new_stack, new_selected
 
+    # -----------------------------
+    # Update Modifier UI
+    # -----------------------------
     @app.callback(
         Output("modifier-pane", "children"),
         Input("selected-operation", "data"),
@@ -119,6 +136,9 @@ def register_callbacks(app: dash.Dash):
 
         return renderer(operation["id"], operation["params"])
 
+    # -----------------------------
+    # Update Parameters of Selected Operation
+    # -----------------------------
     @app.callback(
         Output("operation-stack", "data", allow_duplicate=True),
         Input({"type": "param", "op_id": ALL, "param": ALL}, "value"),
@@ -136,7 +156,6 @@ def register_callbacks(app: dash.Dash):
 
             for op in stack:
                 if op["id"] == op_id:
-                    # Checkbox (like L2gradient) comes as list
                     if param == "L2gradient":
                         op["params"][param] = "L2" in value
                     else:
@@ -144,9 +163,10 @@ def register_callbacks(app: dash.Dash):
                     break
 
         return stack
-    
 
-    # Callback to output stack
+    # -----------------------------
+    # Debug Output
+    # -----------------------------
     @app.callback(
         Output("debug-output", "children"),
         Input("operation-stack", "data")
