@@ -6,11 +6,36 @@ from components import cascader, modifier, preview, toolbar
 def get_layout():
     return dbc.Container([
         dbc.Row([
-            dbc.Col(cascader.render(), width=3, style={"borderRight": "1px solid #ccc", "padding": "10px"}),
+            # Left Panel
+            dbc.Col(cascader.render(), width=3, style={
+                "borderRight": "1px solid #ccc",
+                "padding": "10px"
+            }),
+
+            # Middle Panel
             dbc.Col([
-                html.Div(modifier.render(), style={"height": "40%", "borderBottom": "1px solid #ccc", "padding": "10px"}),
-                html.Div(preview.render(), style={"height": "60%", "padding": "10px"})
-            ], width=9)
-        ], style={"height": "90vh"}),
-        html.Pre(id="debug-output")
+                html.Div(modifier.render(), style={
+                    "height": "40%",
+                    "borderBottom": "1px solid #ccc",
+                    "padding": "10px"
+                }),
+                html.Div(preview.render(), style={
+                    "height": "60%",
+                    "padding": "10px"
+                })
+            ], width=7),
+
+            # Right Panel - Output Text Area
+            dbc.Col(html.Div(
+                id="debug-output",
+                style={
+                    "height": "100%",
+                    "overflowY": "auto",
+                    "backgroundColor": "black",
+                    "color": "white",
+                    "padding": "10px",
+                    "whiteSpace": "pre-wrap"
+                }
+            ), width=2)
+        ], style={"height": "100vh"})
     ], fluid=True)
