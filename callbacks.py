@@ -8,7 +8,28 @@ import uuid
 from operations import operation_renderers
 from operations.blur import PARAMS as BLUR_PARAMS
 from operations.canny import PARAMS as CANNY_PARAMS
+import base64
+import io
+from PIL import Image
+import numpy as np
+import cv2
+import warnings
 
+def apply_operations(image: np.ndarray, operations: list) -> np.ndarray:
+    img = image.copy()
+    for op in operations:
+        if op["type"] == "blur":
+            k = op["params"].get("ksize", 5)
+            img = cv2.blur(img, (k, k))
+        elif op["type"] == "canny":
+            t1 = op["params"].get("threshold1", 100)
+            t2 = op["params"].get("threshold2", 200)
+            l2 = op["params"].get("L2gradient", False)
+            # if len(img.shape) == 3 and img.shape[2] == 3:
+            #     warnings.warn("Canny edge detection was applied to a color image.", UserWarning)
+            img = cv2.Canny(img, t1, t2, L2gradient=l2)
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)  # keep 3-channel
+    return img
 
 def register_callbacks(app: dash.Dash):
     # -----------------------------
@@ -26,6 +47,31 @@ def register_callbacks(app: dash.Dash):
 
         _, content_string = contents.split(',')
         return "Image successfully uploaded!", content_string
+    
+    @app.callback(
+        Output("image-preview", "src"),
+        Input("original-image-store", "data"),
+        Input("operation-stack", "data"),
+        prevent_initial_call=True
+    )
+    def render_processed_image(base64_img, stack):
+        if not base64_img:
+            raise PreventUpdate
+
+        # Decode uploaded base64 image to NumPy array
+        img_data = base64.b64decode(base64_img)
+        img_pil = Image.open(io.BytesIO(img_data)).convert("RGB")
+        img_np = np.array(img_pil)[:, :, ::-1]  # RGB (PIL) → BGR (OpenCV)
+
+        # Apply operation stack
+        if stack:
+            img_np = apply_operations(img_np, stack)
+
+        # Encode back to base64 for display
+        _, buffer = cv2.imencode('.jpg', img_np)
+        encoded = base64.b64encode(buffer).decode()
+        return f"data:image/jpeg;base64,{encoded}"
+
 
     # -----------------------------
     # Operation List UI Update
