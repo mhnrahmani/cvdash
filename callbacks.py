@@ -125,56 +125,56 @@ def register_callbacks(app: dash.Dash):
         new_stack = [op for op in stack if op["id"] != selected_id]
         return new_stack, None
 
-    # # -----------------------------
-    # # Update Modifier UI
-    # # -----------------------------
-    # @app.callback(
-    #     Output("modifier-pane", "children"),
-    #     Input("selected-operation", "data"),
-    #     State("operation-stack", "data"),
-    #     prevent_initial_call=True
-    # )
-    # def update_modifier_ui(selected_id, stack):
-    #     if not selected_id or not stack:
-    #         return "No operation selected."
+    # -----------------------------
+    # Update Modifier UI
+    # -----------------------------
+    @app.callback(
+        Output("modifier-pane", "children"),
+        Input("selected-operation", "data"),
+        State("operation-stack", "data"),
+        prevent_initial_call=True
+    )
+    def update_modifier_ui(selected_id, stack):
+        if not selected_id or not stack:
+            return "No operation selected."
 
-    #     operation = next((op for op in stack if op["id"] == selected_id), None)
-    #     if not operation:
-    #         return "Invalid selection."
+        operation = next((op for op in stack if op["id"] == selected_id), None)
+        if not operation:
+            return "Invalid selection."
 
-    #     renderer = operation_renderers.get(operation["type"])
-    #     if not renderer:
-    #         return f"No UI for operation type '{operation['type']}'."
+        renderer = operation_renderers.get(operation["type"])
+        if not renderer:
+            return f"No UI for operation type '{operation['type']}'."
 
-    #     return renderer(operation["id"], operation["params"])
+        return renderer(operation["id"], operation["params"])
 
-    # # -----------------------------
-    # # Update Parameters of Selected Operation
-    # # -----------------------------
-    # @app.callback(
-    #     Output("operation-stack", "data", allow_duplicate=True),
-    #     Input({"type": "param", "op_id": ALL, "param": ALL}, "value"),
-    #     State({"type": "param", "op_id": ALL, "param": ALL}, "id"),
-    #     State("operation-stack", "data"),
-    #     prevent_initial_call=True
-    # )
-    # def update_operation_params(values, ids, stack):
-    #     if not stack or not values or not ids:
-    #         raise PreventUpdate
+    # -----------------------------
+    # Update Parameters of Selected Operation
+    # -----------------------------
+    @app.callback(
+        Output("operation-stack", "data", allow_duplicate=True),
+        Input({"type": "param", "op_id": ALL, "param": ALL}, "value"),
+        State({"type": "param", "op_id": ALL, "param": ALL}, "id"),
+        State("operation-stack", "data"),
+        prevent_initial_call=True
+    )
+    def update_operation_params(values, ids, stack):
+        if not stack or not values or not ids:
+            raise PreventUpdate
 
-    #     for value, id_ in zip(values, ids):
-    #         op_id = id_["op_id"]
-    #         param = id_["param"]
+        for value, id_ in zip(values, ids):
+            op_id = id_["op_id"]
+            param = id_["param"]
 
-    #         for op in stack:
-    #             if op["id"] == op_id:
-    #                 if param == "L2gradient":
-    #                     op["params"][param] = "L2" in value
-    #                 else:
-    #                     op["params"][param] = value
-    #                 break
+            for op in stack:
+                if op["id"] == op_id:
+                    if param == "L2gradient":
+                        op["params"][param] = "L2" in value
+                    else:
+                        op["params"][param] = value
+                    break
 
-    #     return stack
+        return stack
 
     # -----------------------------
     # Debug Output
