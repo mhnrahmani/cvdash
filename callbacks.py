@@ -8,6 +8,7 @@ import uuid
 from operations import operation_renderers
 from operations.blur import PARAMS as BLUR_PARAMS
 from operations.canny import PARAMS as CANNY_PARAMS
+from operations.grayscale import PARAMS as GRAYSCALE_PARAMS
 import base64
 import io
 from PIL import Image
@@ -18,7 +19,9 @@ import warnings
 def apply_operations(image: np.ndarray, operations: list) -> np.ndarray:
     img = image.copy()
     for op in operations:
-        if op["type"] == "blur":
+        if op["type"] == "grayscale":
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        elif op["type"] == "blur":
             k = op["params"].get("ksize", 5)
             img = cv2.blur(img, (k, k))
         elif op["type"] == "canny":
@@ -103,18 +106,21 @@ def register_callbacks(app: dash.Dash):
     # -----------------------------
     @app.callback(
         Output("operation-stack", "data", allow_duplicate=True),
+        Input("add-grayscale-btn", "n_clicks"),
         Input("add-blur-btn", "n_clicks"),
         Input("add-canny-btn", "n_clicks"),
         State("operation-stack", "data"),
         prevent_initial_call=True
     )
-    def add_operation(n_blur, n_canny, stack):
+    def add_operation(n_grayscale, n_blur, n_canny, stack):
         button_id = ctx.triggered_id
         if stack is None:
             stack = []
 
         new_op = None
-        if button_id == "add-blur-btn":
+        if button_id == "add-grayscale-btn":
+            new_op = {"id": str(uuid.uuid4()), "type": "grayscale", "params": GRAYSCALE_PARAMS.copy()}
+        elif button_id == "add-blur-btn":
             new_op = {"id": str(uuid.uuid4()), "type": "blur", "params": BLUR_PARAMS.copy()}
         elif button_id == "add-canny-btn":
             new_op = {"id": str(uuid.uuid4()), "type": "canny", "params": CANNY_PARAMS.copy()}

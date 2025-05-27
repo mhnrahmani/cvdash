@@ -34,7 +34,8 @@ def render():
         ]),
 
         html.Div([
-            html.Button("Add Gaussian Blur", id="add-blur-btn", style={"marginTop": "10px", "marginRight": "5px"}),
-            html.Button("Add Canny Edge", id="add-canny-btn", style={"marginTop": "10px"})
+            html.Button("Add Grayscale", id="add-grayscale-btn"),
+            html.Button("Add Gaussian Blur", id="add-blur-btn"),
+            html.Button("Add Canny Edge", id="add-canny-btn"),
         ])
     ])
