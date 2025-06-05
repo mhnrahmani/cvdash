@@ -9,6 +9,8 @@ from operations import operation_renderers
 from operations.blur import PARAMS as BLUR_PARAMS
 from operations.canny import PARAMS as CANNY_PARAMS
 from operations.grayscale import PARAMS as GRAYSCALE_PARAMS
+from operations.morphology import PARAMS as MORPHOLOGY_PARAMS
+# ^^ Add new operation params ^^
 import base64
 import io
 from PIL import Image
@@ -32,6 +34,11 @@ def apply_operations(image: np.ndarray, operations: list) -> np.ndarray:
             #     warnings.warn("Canny edge detection was applied to a color image.", UserWarning)
             img = cv2.Canny(img, t1, t2, L2gradient=l2)
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)  # keep 3-channel
+        elif op["type"] == "morphology":
+            # apply the logic of morphology operation
+            pass  # Placeholder for morphology operation
+        # ^^ Add new operation logic ^^
+
     return img
 
 def register_callbacks(app: dash.Dash):
@@ -109,10 +116,12 @@ def register_callbacks(app: dash.Dash):
         Input("add-grayscale-btn", "n_clicks"),
         Input("add-blur-btn", "n_clicks"),
         Input("add-canny-btn", "n_clicks"),
+        Input("add-morphology-btn", "n_clicks"),
+        # ^^ Add new operation as Input ^^
         State("operation-stack", "data"),
         prevent_initial_call=True
     )
-    def add_operation(n_grayscale, n_blur, n_canny, stack):
+    def add_operation(n_grayscale, n_blur, n_canny, n_morph, stack):
         button_id = ctx.triggered_id
         if stack is None:
             stack = []
@@ -124,6 +133,9 @@ def register_callbacks(app: dash.Dash):
             new_op = {"id": str(uuid.uuid4()), "type": "blur", "params": BLUR_PARAMS.copy()}
         elif button_id == "add-canny-btn":
             new_op = {"id": str(uuid.uuid4()), "type": "canny", "params": CANNY_PARAMS.copy()}
+        elif button_id == "add-morphology-btn":
+            new_op = {"id": str(uuid.uuid4()), "type": "morphology", "params": MORPHOLOGY_PARAMS.copy()}
+        # ^^ Add new operation ^^
 
         if new_op:
             stack.append(new_op)

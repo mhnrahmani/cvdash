@@ -37,5 +37,6 @@ def render():
             html.Button("Add Grayscale", id="add-grayscale-btn"),
             html.Button("Add Gaussian Blur", id="add-blur-btn"),
             html.Button("Add Canny Edge", id="add-canny-btn"),
+            html.Button("Add Morphology", id="add-morphology-btn")
         ])
     ])
