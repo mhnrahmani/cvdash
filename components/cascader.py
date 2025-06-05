@@ -24,14 +24,10 @@ def render():
                 multiple=False,
                 accept="image/*"
             ),
-            html.Div(id="upload-status", style={"color": "green", "marginTop": "10px"})
-        ], style={"marginBottom": "20px"}),
-
-        html.Div([
-            html.H5("Operations List"),
-            html.Div(id="operation-list"),
-            html.Button("Delete Selected", id="delete-operation-btn", style={"marginTop": "10px", "backgroundColor": "#ff4d4f", "color": "white"})
-        ]),
+            html.Div(id="upload-status",
+                style={"color": "green", "marginTop": "10px", "borderBottom": "1px solid #ccc"}
+            )
+        ], style={"marginBottom": "10px"}),
 
         html.Div([
             html.Button("Add Grayscale", id="add-grayscale-btn"),
@@ -39,5 +35,12 @@ def render():
             html.Button("Add Canny Edge", id="add-canny-btn"),
             html.Button("Add Morphology", id="add-morphology-btn"),
             html.Button("Add Adapt. Thresh.", id="add-adaptive-threshold-btn"),
+            html.Div(style={"height": "20px"}),
+        ]),
+
+        html.Div([
+            html.H5("Operations List"),
+            html.Div(id="operation-list"),
+            html.Button("Delete Selected", id="delete-operation-btn", style={"marginTop": "10px", "backgroundColor": "#ff4d4f", "color": "white"})
         ])
     ])
