@@ -2,7 +2,7 @@
 from dash import html, dcc
 
 PARAMS = {
-    # "maxValue": 255,
+    "maxValue": 255,
     "adaptiveMethod": "mean",  # 'mean' or 'gaussian'
     "thresholdType": "binary",  # 'binary' or 'binary_inv'
     "blockSize": 11,
@@ -12,11 +12,11 @@ PARAMS = {
 def render_ui(op_id, params):
     return html.Div([
         html.H5("Adaptive Threshold Parameters"),
-        # dcc.Slider(
-        #     id={"type": "param", "op_id": op_id, "param": "maxValue"},
-        #     min=0, max=255, step=1, value=params["maxValue"],
-        #     tooltip={"placement": "bottom", "always_visible": True},
-        # ),
+        dcc.Slider(
+            id={"type": "param", "op_id": op_id, "param": "maxValue"},
+            min=0, max=255, step=1, value=params["maxValue"],
+            tooltip={"placement": "bottom", "always_visible": True},
+        ),
         html.Label("Adaptive Method"),
         dcc.Dropdown(
             id={"type": "param", "op_id": op_id, "param": "adaptiveMethod"},

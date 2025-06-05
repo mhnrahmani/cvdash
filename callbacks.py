@@ -22,24 +22,44 @@ import warnings
 def apply_operations(image: np.ndarray, operations: list) -> np.ndarray:
     img = image.copy()
     for op in operations:
-        if op["type"] == "grayscale":
+        op_type = op["type"]
+        params = op["params"]
+
+        if op_type == "grayscale":
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        elif op["type"] == "blur":
-            k = op["params"].get("ksize", 5)
+        elif op_type == "blur":
+            k = params.get("ksize", 5)
             img = cv2.blur(img, (k, k))
-        elif op["type"] == "canny":
-            t1 = op["params"].get("threshold1", 100)
-            t2 = op["params"].get("threshold2", 200)
-            l2 = op["params"].get("L2gradient", False)
+        elif op_type == "canny":
+            # TODO: Must be grayscale
             # if len(img.shape) == 3 and img.shape[2] == 3:
             #     warnings.warn("Canny edge detection was applied to a color image.", UserWarning)
+            t1 = params.get("threshold1", 100)
+            t2 = params.get("threshold2", 200)
+            l2 = params.get("L2gradient", False)
             img = cv2.Canny(img, t1, t2, L2gradient=l2)
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)  # keep 3-channel
-        elif op["type"] == "morphology":
-            # apply the logic of morphology operation
-            pass  # Placeholder for morphology operation
-        elif op["type"] == "adaptive_threshold":
-            pass
+        elif op_type == "morphology":
+            op_map = {
+                "dilate": cv2.dilate,
+                "erode": cv2.erode
+            }
+            kernel = np.ones((params["kernel_size"], params["kernel_size"]), np.uint8)
+            operation_fn = op_map.get(params["operation"])
+            if operation_fn:
+                img = operation_fn(img, kernel, iterations=params["iterations"])
+        elif op_type == "adaptive_threshold":
+            # TODO: Must be grayscale
+            method = cv2.ADAPTIVE_THRESH_MEAN_C if params["adaptiveMethod"] == "mean" else cv2.ADAPTIVE_THRESH_GAUSSIAN_C
+            thresh_type = cv2.THRESH_BINARY if params["thresholdType"] == "binary" else cv2.THRESH_BINARY_INV
+            img = cv2.adaptiveThreshold(
+                img,
+                maxValue=params["maxValue"],
+                adaptiveMethod=method,
+                thresholdType=thresh_type,
+                blockSize=params["blockSize"],
+                C=params["C"]
+            )
         # ^^ Add new operation logic ^^
 
     return img
