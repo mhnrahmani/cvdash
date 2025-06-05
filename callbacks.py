@@ -10,6 +10,7 @@ from operations.blur import PARAMS as BLUR_PARAMS
 from operations.canny import PARAMS as CANNY_PARAMS
 from operations.grayscale import PARAMS as GRAYSCALE_PARAMS
 from operations.morphology import PARAMS as MORPHOLOGY_PARAMS
+from operations.adaptive_threshold import PARAMS as ADAPTIVE_THRESHOLD_PARAMS
 # ^^ Add new operation params ^^
 import base64
 import io
@@ -37,6 +38,8 @@ def apply_operations(image: np.ndarray, operations: list) -> np.ndarray:
         elif op["type"] == "morphology":
             # apply the logic of morphology operation
             pass  # Placeholder for morphology operation
+        elif op["type"] == "adaptive_threshold":
+            pass
         # ^^ Add new operation logic ^^
 
     return img
@@ -117,11 +120,12 @@ def register_callbacks(app: dash.Dash):
         Input("add-blur-btn", "n_clicks"),
         Input("add-canny-btn", "n_clicks"),
         Input("add-morphology-btn", "n_clicks"),
+        Input("add-adaptive-threshold-btn", "n_clicks"),
         # ^^ Add new operation as Input ^^
         State("operation-stack", "data"),
         prevent_initial_call=True
     )
-    def add_operation(n_grayscale, n_blur, n_canny, n_morph, stack):
+    def add_operation(n_grayscale, n_blur, n_canny, n_morph, n_adaptive_threshold, stack):
         button_id = ctx.triggered_id
         if stack is None:
             stack = []
@@ -135,6 +139,8 @@ def register_callbacks(app: dash.Dash):
             new_op = {"id": str(uuid.uuid4()), "type": "canny", "params": CANNY_PARAMS.copy()}
         elif button_id == "add-morphology-btn":
             new_op = {"id": str(uuid.uuid4()), "type": "morphology", "params": MORPHOLOGY_PARAMS.copy()}
+        elif button_id == "add-adaptive-threshold-btn":
+            new_op = {"id": str(uuid.uuid4()), "type": "adaptive_threshold", "params": ADAPTIVE_THRESHOLD_PARAMS.copy()}
         # ^^ Add new operation ^^
 
         if new_op:
