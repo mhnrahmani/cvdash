@@ -6,6 +6,7 @@ from layout import get_layout
 from callbacks import register_callbacks
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], assets_folder="assets")
+server = app.server
 app.title = "Image Processing Dashboard"
 
 # Global stores for image and operation management
@@ -19,4 +20,7 @@ app.layout = html.Div([
 register_callbacks(app)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(
+        debug=True,
+        port=8050,
+    )
