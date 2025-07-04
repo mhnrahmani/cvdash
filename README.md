@@ -21,9 +21,8 @@ CV Dash is an interactive image-processing dashboard built with [Dash](https://d
 
 ## 📸 Demo
 
-A live version of the dashboard will be hosted soon. Stay tuned!
-
-<!-- ![Dashboard Preview](link-to-screenshot.gif) -->
+A live version of the dashboard is hosten on [cvdash.mhnrahmani.dev](https://cvdash.mhnrahmani.dev).
+Upload a photo and have fun playing with OpenCV operations!
 
 ---
 
