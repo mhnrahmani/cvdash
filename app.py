@@ -7,7 +7,7 @@ from callbacks import register_callbacks
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], assets_folder="assets")
 server = app.server
-app.title = "Image Processing Dashboard"
+app.title = "The OpenCV Dashboard"
 
 # Global stores for image and operation management
 app.layout = html.Div([
